@@ -1,0 +1,669 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover and share stunning images on our vibrant gallery platform">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <title>Image Gallery</title>
+  <!-- Google Fonts: Inter and Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <!-- Google Sign-In Script -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    /* Global Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-image: url('http://cdn.wallpapersafari.com/48/17/0SDb2r.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-color: rgba(255, 255, 255, 0.1); /* Increased opacity for brighter overlay */
+      background-blend-mode: overlay;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header Styles */
+    .header {
+      background: linear-gradient(90deg, #1a202c 0%, #2d3748 100%);
+      color: #ffffff;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+    }
+
+    .logo img {
+      height: 40px;
+      width: 90px;
+      transition: transform 0.3s ease;
+    }
+
+    .logo img:hover {
+      transform: scale(1.05);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    nav a {
+      font-size: 16px;
+      font-weight: 500;
+      color: #e2e8f0;
+      transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    nav a:hover {
+      color: #4fd1c5;
+      transform: translateY(-2px);
+    }
+
+    nav a.btn {
+      background-color: #f56565;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    nav a.btn:hover {
+      background-color: #e53e3e;
+      transform: translateY(-2px);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .mobile-menu-btn svg {
+      width: 28px;
+      height: 28px;
+      stroke: #ffffff;
+      stroke-width: 2;
+    }
+
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: #1a202c;
+      position: absolute;
+      top: 80px;
+      left: 0;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .mobile-menu a {
+      color: #e2e8f0;
+      font-size: 16px;
+      padding: 12px 0;
+      transition: color 0.3s ease;
+    }
+
+    .mobile-menu a:hover {
+      color: #4fd1c5;
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #ffffff;
+      padding-top: 80px;
+    }
+
+    .hero-content {
+      max-width: 700px;
+      padding: 32px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero h1 {
+      font-size: 56px;
+      margin-bottom: 16px;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero p {
+      font-size: 24px;
+      font-style: italic;
+      margin-bottom: 32px;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-btn {
+      background: #f56565;
+      color: #ffffff;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 600;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .cta-btn:hover {
+      background: #e53e3e;
+      transform: scale(1.1);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 80px 0;
+      background-color: #ffffff;
+    }
+
+    .features h2 {
+      font-size: 40px;
+      text-align: center;
+      margin-bottom: 48px;
+      color: #2d3748;
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: row;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 32px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-card img {
+      width: 50%;
+      height: 300px;
+      object-fit: cover;
+    }
+
+    .feature-content {
+      padding: 32px;
+      width: 50%;
+    }
+
+    .feature-content h3 {
+      font-size: 28px;
+      margin-bottom: 16px;
+      color: #2d3748;
+    }
+
+    .feature-content p {
+      font-size: 16px;
+      color: #4a5568;
+      margin-bottom: 24px;
+    }
+
+    .feature-content a {
+      color: #4fd1c5;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .feature-content a:hover {
+      color: #38b2ac;
+    }
+
+    /* Footer Styles */
+    footer {
+      background: linear-gradient(90deg, #1a202c 0%, #2d3748 100%);
+      color: #e2e8f0;
+      padding: 64px 0 24px;
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+      padding: 24px;
+    }
+
+    .footer-section h3 {
+      font-size: 22px;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .footer-section p,
+    .footer-section a {
+      color: #e2e8f0;
+      font-size: 15px;
+      margin-bottom: 12px;
+      transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+      color: #4fd1c5;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 12px;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .social-icons a svg {
+      width: 32px;
+      height: 32px;
+      fill: #e2e8f0;
+      transition: fill 0.3s ease, transform 0.2s ease;
+    }
+
+    .social-icons a:hover svg {
+      fill: #4fd1c5;
+      transform: scale(1.1);
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 32px;
+      color: #a0aec0;
+      font-size: 14px;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+    }
+
+    .modal-content .close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .tab-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 16px;
+    }
+
+    .tab-buttons button {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #4a5568;
+    }
+
+    .tab-buttons button.active {
+      color: #f56565;
+      border-bottom: 2px solid #f56565;
+    }
+
+    .form-section {
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    .form-section input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+    }
+
+    .form-section button {
+      width: 100%;
+      padding: 12px;
+      background: #f56565;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 16px;
+    }
+
+    .form-section button:hover {
+      background: #e53e3e;
+    }
+
+    .google-btn {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .forgot-password {
+      display: block;
+      text-align: center;
+      margin-top: 8px;
+      color: #4fd1c5;
+      cursor: pointer;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 24px;
+      }
+
+      .mobile-menu.active {
+        display: flex;
+      }
+
+      .hero {
+        padding-top: 100px;
+      }
+
+      .hero-content h1 {
+        font-size: 36px;
+      }
+
+      .hero-content p {
+        font-size: 18px;
+      }
+
+      .cta-btn {
+        padding: 12px 24px;
+        font-size: 16px;
+      }
+
+      .feature-card {
+        flex-direction: column;
+      }
+
+      .feature-card img {
+        width: 100%;
+        height: 200px;
+      }
+
+      .feature-content {
+        width: 100%;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .footer-section {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-content h1 {
+        font-size: 28px;
+      }
+
+      .hero-content p {
+        font-size: 16px;
+      }
+
+      .features h2 {
+        font-size: 32px;
+      }
+
+      .feature-content h3 {
+        font-size: 24px;
+      }
+    }
+
+    /* Hide Upload link for non-logged-in users */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header>
+    <div class="header-content container">
+      <!-- Logo -->
+      <a href="#" class="logo">
+        <img src="https://media.istockphoto.com/id/1472297781/photo/3d-render-of-gallery-colorful-typography-banner.jpg?s=1024x1024&w=is&k=20&c=Uhl2dSTbdpcyL013fxp6PDso9JcyqvtsELyhSGBaUA4=" alt="Image Gallery Logo">
+      </a>
+      <p class="text-muted">Welcome <strong>{{ request.user.username }}</strong></p>
+      <!-- Navigation -->
+      <nav>
+        
+        <a href="{% url 'dashboard' %}">Home</a>
+        <a href="{% url 'categories' %}">Categories</a>
+        
+        <a href="{% url 'home' %}">Upload</a>
+
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a>
+      </nav>
+      <!-- Hamburger Menu (Mobile) -->
+      <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Capture the World in Colors</h1>
+      <p>"Every picture tells a story."</p>
+      <a href="{% url 'categories' %}" class="cta-btn">Explore Gallery</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2>What Can We Do?</h2>
+      <!-- Feature Card 1 -->
+      <div class="feature-card">
+        <img src="https://tse4.mm.bing.net/th?id=OIF.qqD4%2f9tDdZ1OPs6klnq8Eg&pid=Api&P=0&h=180" alt="Upload Images Feature">
+        <div class="feature-content">
+          <h3>Upload Images</h3>
+          <p>Easily upload your images and share them with our vibrant community.</p>
+          <a href="{% url 'home' %}">Try Now</a>
+        </div>
+      </div>
+      <!-- Feature Card 2 -->
+      <div class="feature-card">
+        <img src="https://tse4.mm.bing.net/th/id/OIP.67DZtOnSLEPKwSCDpAakmAHaE8?pid=Api&P=0&h=180" alt="Discover Images Feature">
+        <div class="feature-content">
+          <h3>Discover Images</h3>
+          <p>Explore thousands of high-quality images across categories like Nature, Art, and Travel.</p>
+          <a href="{% url 'categories' %}">Try Now</a>
+        </div>
+      </div>
+      <!-- Feature Card 3 -->
+      <div class="feature-card">
+        <img src="https://tse3.mm.bing.net/th/id/OIP.NB9zDSys4czBuOL3OEWn0QHaE8?pid=Api&P=0&h=180" alt="Connect with Creators Feature">
+        <div class="feature-content">
+          <h3>Connect with Creators</h3>
+          <p>Engage with photographers and artists through likes, comments, and follows.</p>
+          <a href="#community">Join Now</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Authentication Modal -->
+  
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-content container">
+      <!-- About -->
+      <div class="footer-section">
+        <h3>About Us</h3>
+        <p>Your go-to platform for discovering and sharing stunning images.</p>
+        <img src="https://via.placeholder.com/100x40?text=Gallery+Logo" alt="Image Gallery Logo">
+      </div>
+      <!-- Navigation -->
+      <div class="footer-section">
+        <h3>Links</h3>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="#upload">Upload</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <!-- Social Media -->
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a href="#" aria-label="Twitter">
+            <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path></svg>
+          </a>
+          <a href="#" aria-label="Instagram">
+            <svg viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm8.5 1.5h-8.5a4.25 4.25 0 00-4.25 4.25v8.5a4.25 4.25 0 004.25 4.25h8.5a4.25 4.25 0 004.25-4.25v-8.5a4.25 4.25 0 00-4.25-4.25zm-4.25 3.25a5.5 5.5 0 110 11 5.5 5.5 0 010-11zm0 1.5a4 4 0 100 8 4 4 0 000-8zm4.75-2.25a1 1 0 110 2 1 1 0 010-2z"></path></svg>
+          </a>
+          <a href="#" aria-label="Facebook">
+            <svg viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.13 8.44 9.88v-7h-2.54v-2.88h2.54v-2.2c0-2.5 1.5-3.87 3.7-3.87 1.05 0 1.95.08 2.22.11v2.57h-1.52c-1.2 0-1.43.57-1.43 1.4v1.83h2.86l-.37 2.88h-2.49v7C18.34 21.13 22 16.99 22 12z"></path></svg>
+          </a>
+        </div>
+      </div>
+      <!-- Contact & Legal -->
+      <div class="footer-section">
+        <h3>Contact</h3>
+        <p>Email: <a href="mailto:support@yourgallery.com">support@yourgallery.com</a></p>
+        <ul>
+          <li><a href="#privacy">Privacy Policy</a></li>
+          <li><a href="#terms">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Image Gallery. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+
+    // Modal and Tab Management
+    const authModal = document.getElementById('authModal');
+    const profileBtn = document.getElementById('profile-btn');
+    const mobileProfileBtn = document.getElementById('mobile-profile-btn');
+
+    function openModal(tabName) {
+      authModal.style.display = 'block';
+      openAuthTab(tabName);
+      if (mobileMenu.classList.contains('active')) {
+        mobileMenu.classList.remove('active');
+      }
+    }
+
+    function closeModal() {
+      authModal.style.display = 'none';
+    }
+</script>
+   
+</body>
+</html>

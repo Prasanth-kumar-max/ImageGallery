@@ -1,0 +1,163 @@
+{% extends 'layout/app.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Gallery</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons (if needed in the future) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <style>
+    body {
+      background: url(http://thewowstyle.com/wp-content/uploads/2015/01/nature-images.jpg) no-repeat center center fixed;
+      background-size: cover;
+      animation: zoomInOut 20s ease-in-out infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column; /* Ensure vertical stacking of gallery and login */
+    }
+
+    @keyframes zoomInOut {
+      0%, 100% {
+        background-size: 100%;
+      }
+      50% {
+        background-size: 105%;
+      }
+    }
+
+    .card {
+      width: 100%;
+      max-width: 360px; /* Limit the width of the login card */
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 0 30px rgba(0, 128, 0, 0.1);
+      background-color: #ffffffcc;
+      backdrop-filter: blur(4px);
+      margin: 1rem;
+    }
+
+    .card-body {
+      padding: 1.5rem; /* Reduced padding for a tighter look */
+    }
+
+    h3 {
+      background: linear-gradient(to right, #28a745, #218838);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 1px solid #ced4da;
+    }
+
+    .form-control:focus {
+      background-color: #fff;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+      border-color: #28a745;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+
+    .text-link {
+      text-decoration: none;
+    }
+
+    .text-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Gallery styles */
+    .gallery-container {
+  max-width: 600px;
+  margin: 0 auto 0rem auto; /* Centered */
+  margin-left: 14rem; /* Push slightly to the right */
+  background-color: rgba(255, 255, 255,);
+  border-radius: 1rem;
+ 
+  padding: 1rem;
+  text-align: center;
+}
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Image Gallery (Empty Container with Heading) -->
+    <div class="row justify-content-center gallery-container">
+      <h3 class="text-center text-success fs-1 mb-4">Image Gallery</h3>
+      <!-- Empty gallery container for future images -->
+      <div class="row row-cols-1 row-cols-md-3 g-3">
+        <!-- Add images here later if needed -->
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm rounded border border-success">
+          <div class="card-body">
+            <h3 class="text-center text-success mb-4">Sign In</h3>
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors.as_ul }}
+              </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'login' %}">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}"
+                       class="form-control" value="{{ form.username.value|default:'' }}">
+                <div class="text-danger small">{{ form.username.errors }}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}"
+                       class="form-control" value="{{ form.password.value|default:'' }}">
+                <div class="text-danger small">{{ form.password.errors }}</div>
+              </div>
+
+              <div class="d-grid mb-3">
+                <button type="submit" class="btn btn-success">Login</button>
+              </div>
+
+              <div class="text-center">
+                <a href="{% url 'register' %}" class="text-success text-link">Create your account</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+{% endblock %}

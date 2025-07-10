@@ -1,0 +1,177 @@
+{% extends 'layout/app.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Gallery</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <style>
+    body {
+      background: url(http://thewowstyle.com/wp-content/uploads/2015/01/nature-images.jpg) no-repeat center center fixed;
+      background-size: cover;
+      animation: zoomInOut 20s ease-in-out infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column; /* Ensure vertical stacking of gallery and form */
+    }
+
+    @keyframes zoomInOut {
+      0%, 100% {
+        background-size: 100%;
+      }
+      50% {
+        background-size: 105%;
+      }
+    }
+
+    .card {
+      border: none;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.25);
+      background-color: rgba(255, 255, 255, 0.75); /* more transparent */
+      backdrop-filter: blur(6px);
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.6); /* transparent input */
+      border: 1px solid #ced4da;
+    }
+
+    .form-control:focus {
+      background-color: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+      border-color: #28a745;
+    }
+
+    .btn {
+      border-radius: 50px;
+      transition: all 0.3s ease-in-out;
+      background-color: rgba(40, 167, 69, 0.9); /* semi-transparent button */
+    }
+
+    .btn-success:hover {
+      background-color: rgba(33, 136, 56, 0.95);
+    }
+
+    /* Gallery styles */
+    
+
+    h3 {
+      background: linear-gradient(to right, #28a745, #218838);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gallery-container {
+  max-width: 600px;
+  margin: 0 auto 0rem auto; /* Centered */
+  margin-left: 16rem; /* Push slightly to the right */
+  background-color: rgba(255, 255, 255,);
+  border-radius: 1rem;
+ 
+  padding: 1rem;
+  text-align: center;
+}
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Image Gallery (Empty Container with Heading) -->
+    <div class="row justify-content-center gallery-container">
+      <h3 class="text-center text-success fs-1 mb-4">Image Gallery</h3>
+      <!-- Empty gallery container for future images -->
+      <div class="row row-cols-1 row-cols-md-3 g-3">
+        <!-- Add images here later if needed -->
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5 col-xl-4">
+        <div class="card shadow-sm rounded">
+          <div class="card-body">
+            <h3 class="text-center text-success mb-4 fw-bold">Create Account</h3>
+
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'register' %}">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                <input type="text" name="{{ form.username.name }}" class="form-control"
+                       id="{{ form.username.id_for_label }}">
+                <div class="text-danger small">{{ form.username.errors }}</div>
+              </div>
+
+              <div class="mb-3 position-relative">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">Password</label>
+                <input type="password" name="{{ form.password1.name }}" class="form-control pe-5"
+                       id="{{ form.password1.id_for_label }}">
+                <!-- Eye icon toggle -->
+                <span class="position-absolute end-0 me-3" 
+                      style="top: 67%; transform: translateY(-50%); cursor: pointer;" 
+                      onclick="togglePassword('{{ form.password1.id_for_label }}', 'toggleIcon')">
+                  <i class="bi bi-eye" id="toggleIcon"></i>
+                </span>
+                <div class="text-danger small">{{ form.password1.errors }}</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password</label>
+                <input type="password" name="{{ form.password2.name }}" class="form-control"
+                       id="{{ form.password2.id_for_label }}">
+                <div class="text-danger small">{{ form.password2.errors }}</div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success">Register</button>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary">Already have an account? Login</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

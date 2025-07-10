@@ -1,0 +1,537 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartGallery | Categories</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      background: #f5f5f5;
+    }
+
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateX(-20px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    .container {
+      display: flex;
+      flex-direction: row;
+      min-height: calc(100vh - 60px);
+    }
+
+    .header {
+      background-color: #1f2a44;
+      padding: 0.75rem 1.5rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1001;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #60a5fa;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background-color: #f28b82;
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #ef4444;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 60px;
+      bottom: 0;
+      width: 280px;
+      background-color: #0f172a;
+      color: #fff;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #ffffff;
+      padding-bottom: 8px;
+    }
+
+    .category {
+      margin-bottom: 15px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .category-title {
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .category-title:hover {
+      background-color: #1e293b;
+    }
+
+    .category-title h3 {
+      margin: 0;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category.open .category-title h3 {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .subcategories {
+      display: none;
+      margin-left: 15px;
+      padding-top: 10px;
+    }
+
+    .subcategories label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 8px 0;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+
+    .subcategories label:hover {
+      color: #ffffff;
+    }
+
+    .subcategories input[type="checkbox"] {
+      margin-right: 8px;
+      accent-color: #ffffff;
+    }
+
+    .gallery {
+      background-color: #000;
+      color: #f1f1f1;
+      padding: 24px;
+      border-radius: 8px;
+      margin: 24px 0;
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.7;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    .gallery strong {
+      color: #f28b82;
+    }
+
+    .gallery em {
+      color: #ffcc70;
+    }
+
+    .image-display {
+      flex: 1;
+      padding: 30px;
+      margin-left: 300px;
+      max-width: calc(100% - 300px);
+      margin-top: 60px;
+      border-radius: 8px;
+    }
+
+    .image-display h1 {
+      font-size: 32px;
+      margin: 0 0 20px;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #ffffff;
+      display: inline-block;
+      padding-bottom: 5px;
+      animation: slideIn 0.8s ease-out;
+      color: #000;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      padding: 10px;
+    }
+
+    .card {
+      background-color: #1e293b;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-bottom: 2px solid #ffffff;
+    }
+
+    .card-content {
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-content h4 {
+      margin: 0;
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .like-btn, .save-btn {
+      background: none;
+      border: none;
+      padding: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      color: #666;
+      transition: color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .like-btn.liked {
+      color: #e63946;
+      transform: scale(1.1);
+      cursor: default;
+    }
+
+    .like-btn .like-count {
+      font-size: 12px;
+      margin-left: 5px;
+      color: #666;
+    }
+
+    .like-btn.liked .like-count {
+      color: #e63946;
+    }
+
+    .save-btn.saved {
+      color: #2a9d8f;
+      transform: scale(1.1);
+    }
+
+    .like-btn:hover:not(.liked), .save-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .like-btn.liked:hover {
+      transform: scale(1.1);
+    }
+
+    .default-image {
+      display: block;
+      margin: 20px auto;
+      border-radius: 8px;
+      max-width: 350px;
+      animation: slideIn 1s ease-out;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        position: relative;
+        top: 0;
+        margin-top: 60px;
+      }
+
+      .image-display {
+        margin-left: 0;
+        max-width: 100%;
+        margin-top: 0;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .header-content {
+        padding: 0 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <a href="#" class="logo">
+        <img src="https://media.istockphoto.com/id/1472297781/photo/3d-render-of-gallery-colorful-typography-banner.jpg?s=1024x1024&w=is&k=20&c=Uhl2dSTbdpcyL013fxp6PDso9JcyqvtsELyhSGBaUA4=" alt="SmartGallery Logo">
+      </a>
+      <p class="text-muted">Welcome <strong>{{ request.user.username }}</strong></p> 
+      <nav>
+        <a href="{% url 'dashboard' %}">Home</a>
+        <a href="{% url 'categories' %}">Categories</a>
+        <a href="{% url 'home' %}">Upload</a>
+        <a href="{% url 'logout' %}" class="btn">Logout</a>
+      </nav>
+    </div>
+  </header>
+<strong>
+  <div class="container">
+    <aside class="sidebar">
+      <h2> SmartGallery</h2>
+      <div class="category">
+        <div class="category-title" onclick="toggleSub(this)" role="button" aria-expanded="false" aria-label="Toggle Landscapes category">
+          <h3>🌄 Landscapes <span class="toggle-icon">+</span></h3>
+        </div>
+        <div class="subcategories">
+          <label><input type="checkbox" value="forest"> Forest</label>
+          <label><input type="checkbox" value="mountain"> Mountain</label>
+          <label><input type="checkbox" value="beaches"> Beaches</label>
+        </div>
+      </div>
+      <div class="category">
+        <div class="category-title" onclick="toggleSub(this)" role="button" aria-expanded="false" aria-label="Toggle Plants category">
+          <h3>🌿 Plants <span class="toggle-icon">+</span></h3>
+        </div>
+        <div class="subcategories">
+          <label><input type="checkbox" value="flowers"> Flowers</label>
+          <label><input type="checkbox" value="trees"> Trees</label>
+        </div>
+      </div>
+      <div class="category">
+        <div class="category-title" onclick="toggleSub(this)" role="button" aria-expanded="false" aria-label="Toggle Animals category">
+          <h3>🐾 Animals <span class="toggle-icon">+</span></h3>
+        </div>
+        <div class="subcategories">
+          <label><input type="checkbox" value="wildlife"> Wildlife</label>
+          <label><input type="checkbox" value="birds"> Birds</label>
+        </div>
+      </div>
+      <div class="category">
+        <div class="category-title" onclick="toggleSub(this)" role="button" aria-expanded="false" aria-label="Toggle Travel category">
+          <h3>🗺️ Travel <span class="toggle-icon">+</span></h3>
+        </div>
+        <div class="subcategories">
+          <label><input type="checkbox" value="historical"> Historical Landmarks</label>
+          <label><input type="checkbox" value="architecture"> Architectural Wonders</label>
+          <label><input type="checkbox" value="cruise"> Cruises & Waterways</label>
+        </div>
+      </div>
+      <div class="category">
+        <div class="category-title" onclick="toggleSub(this)" role="button" aria-expanded="false" aria-label="Toggle Food category">
+          <h3>🍴 Food <span class="toggle-icon">+</span></h3>
+        </div>
+        <div class="subcategories">
+          <label><input type="checkbox" value="desserts"> Desserts</label>
+          <label><input type="checkbox" value="cuisine"> Cuisine</label>
+        </div>
+      </div>
+    </aside>
+    <main class="image-display">
+      <h1 id="galleryTitle">Explore Categories</h1>
+      <div class="gallery">
+        <p>
+          Welcome to the <strong>Explore Categories</strong> section! 🌟 This gallery is curated to help users discover stunning visuals across different themes and moods.
+          Whether you're looking for design inspiration, aesthetic photography, or just want to enjoy a visual journey, this space is crafted to be your starting point.
+        </p>
+        <p>
+          Each image category opens a new dimension of exploration—from vivid landscapes to abstract art. Dive in, and let each photo tell a story. With just a click,
+          you can immerse yourself in carefully organized collections that are both soothing and surprising. Upload your own or browse others'—every image adds life to this experience.
+        </p>
+        <p>
+          📷 <em>Proven to spark joy:</em> Studies show that simply viewing beautiful images can uplift your mood and reduce stress. So take a moment, scroll through,
+          and let the visuals do their magic.
+        </p>
+      </div>
+      <div class="image-grid" id="imageGrid">
+        <img src="http://cdn.wallpapersafari.com/48/17/0SDb2r.jpg" alt="Default Gallery Image" class="default-image" id="defaultImage">
+      </div>
+    </main>
+  </div>
+</strong>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const likedImages = new Set(JSON.parse(localStorage.getItem('likedImages') || '[]'));
+
+      function saveLikedImages() {
+        localStorage.setItem('likedImages', JSON.stringify([...likedImages]));
+      }
+
+      const imageMap = {
+        forest: ['http://wallpapercave.com/wp/6nUx8Ku.jpg', 'https://www.pixelstalk.net/wp-content/uploads/2016/10/Pine-Forest-Wallpaper-High-Quality-HD.jpg','https://cdn.pixabay.com/photo/2021/11/03/12/28/forest-6765636_1280.jpg','https://picfiles.alphacoders.com/283/283252.jpg','https://www.eurokosmos.gr/wp-content/uploads/2016/09/amazing-autumn-forest-wallpaper-1920x1200.jpg','https://wallup.net/wp-content/uploads/2016/01/38115-lake-forest.jpg','https://picfiles.alphacoders.com/340/340594.jpg','http://wallup.net/wp-content/uploads/2015/12/243666-forest-simple_background-trees-path-nature-landscape.jpg','https://picfiles.alphacoders.com/286/286148.jpg','https://picfiles.alphacoders.com/340/340046.jpg','https://static.vecteezy.com/system/resources/previews/002/445/614/non_2x/carpathian-nature-forest-on-green-hills-in-summer-mountains-free-photo.jpg','https://picfiles.alphacoders.com/281/281097.jpg','https://wallpapers.com/images/featured/forest-pictures-ghluxfda78g0i0ap.jpg','http://images.unsplash.com/photo-1603612692333-7bac35e43500?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MXxzZWFyY2h8MXx8Zm9yZXN0c3x8MHx8fHwxNjI5MDgyMzE0&ixlib=rb-1.2.1&q=80&w=1080','https://picfiles.alphacoders.com/280/280924.jpg','https://static.vecteezy.com/system/resources/thumbnails/002/484/254/small_2x/horizontal-and-colorful-shot-of-a-giant-rock-in-the-middle-of-the-forest-free-photo.JPG','http://www.pixelstalk.net/wp-content/uploads/2016/10/Forest-Free-Pictures-Download.jpg','https://static.vecteezy.com/system/resources/thumbnails/003/606/647/small_2x/elvish-pine-and-fir-forest-with-green-moss-covering-the-floor-photo.jpg','https://picfiles.alphacoders.com/279/thumb-1920-279392.jpg','https://miro.medium.com/v2/resize:fit:719/1*_ZlYZJT9sLs1jCexMBCJuQ.jpeg'],
+        mountain: ['https://tse3.mm.bing.net/th/id/OIP.zg6W_4qdBqPw9EKW_D1X-gHaE8?pid=Api&P=0&h=180','https://www.beautiful-views.net/views/stones-mountains-forest-lake.jpg','https://images.pexels.com/photos/371633/pexels-photo-371633.jpeg?cs=srgb&dl=clouds-country-daylight-371633.jpg&fm=jpg','http://getwallpapers.com/wallpaper/full/3/c/2/655531.jpg','http://vastphotos.com/files/uploads/photos/10252/mountains-in-autumn-landscape-l.jpg','https://wallpapercave.com/wp/wp3251792.jpg','http://phandroid.s3.amazonaws.com/wp-content/uploads/2014/10/mountains.jpg','https://wallpapercave.com/wp/wp4511352.jpg','https://wallpaperaccess.com/full/96518.jpg','http://wallpapercave.com/wp/iLGGg3e.jpg','https://tse1.mm.bing.net/th/id/OIP.nYhFBEuTE1rvMvIJ65PXlQHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.GRxs39DFAfhBwMqEkRevtQHaEs?pid=Api&P=0&h=180','http://www.zastavki.com/pictures/1920x1200/2012/Nature_Mountains_mountain_Lake_033281_.jpg','https://tse2.mm.bing.net/th/id/OIP.T0XaDbf_2UMPMhrzg4s-qAHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.7wxXplXx8xD1kLlvb3sW_QHaE8?pid=Api&P=0&h=180','https://www.atlasandboots.com/wp-content/uploads/2019/05/ama-dablam2-most-beautiful-mountains-in-the-world.jpg','https://tse3.mm.bing.net/th/id/OIP.oOJ1m0H1doWw9Gt2sid0RAHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.S4vR27bfEmVYn62XOT3UtAHaEo?pid=Api&P=0&h=180','https://wallpaperaccess.com/full/38622.jpg','https://tse4.mm.bing.net/th/id/OIP.-swE7REz9ZdVlLpJs_K9BgHaFj?pid=Api&P=0&h=180'],
+        beaches: ['https://tse2.mm.bing.net/th/id/OIP.-bJ9vjKFAixH748GH1BKhwHaFj?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.t8ycaWEnLdPQgZx9XqtdBgHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id OIP.N8F8QgLuxGEUhZeovsyjJwHaFN?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.JajRhfV0YsUsfOwZkou88QHaE8?pid=Api&P=0&h=180','https://wallpapercave.com/wp/8w73UPq.jpg','https://tse1.mm.bing.net/th/id/OIP._HoN8N-I7ARKIcvtl_IwlgHaEK?pid=Api&P=0&h=180','https://i.pinimg.com/originals/32/1d/fa/321dfada1f4a94970483ad091c628e1f.jpg','https://tse4.mm.bing.net/th/id/OIP._PBPFcPNwNWRr615si3KKQHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.R9v3IU5g1lyfM1nK7TC-1QHaE7?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.jXo9vltf5KofhgZXbLcdXwHaE9?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.zC0D7qmtv8FphgIlVUJ31wHaE5?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.jT7UUgSEU5nRMV7p3S82tQHaEo?pid=Api&P=0&h=180','https://i.pinimg.com/originals/04/6a/c5/046ac5bc0f6a62e03f1c4d781153f516.jpg','https://cdn.wallpapersafari.com/21/6/96Ovsh.jpg','http://www.pixelstalk.net/wp-content/uploads/2016/08/Awesome-Sunset-Beaches-Backgrounds.jpg','https://tse4.mm.bing.net/th/id/OIP.-X3WBkSCucVPH2N5Bt6KCAHaLH?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.WXm2vEmKzx_P3bFKbWUvAgHaFj?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.B22YEcsO17Dc5D32mmGPngHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.44OyOupJZo2EoqcZsLZi6gHaFj?pid=Api&P=0&w=300&h=300','https://tse3.mm.bing.net/th/id/OIP.3fwyj6HH2lGyfI5xWvcN9AHaE7?pid=Api&P=0&h=180'],
+        flowers: ['https://tse2.mm.bing.net/th/id/OIP.Ev73u3paUfpg40t4LNSN0gHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.xrYSifewLEVAgEf4yoxzPQHaEV?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.VOAcBhof_ftazKrWMf2QkAHaE7?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.ivpZV6H9cI4xsyGd81DP0wHaE9?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.e6oQ8oVLGQrK5aIlSW-hngHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.XrSOX1AGMUcWNqmEjKcJVQHaE8?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.qAaxSzptPeSCny1-SpC52gHaFj?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.bSkSGQwOCZ7ePOKhNawjbAHaFj?pid=Api&P=0&h=180','https://images7.alphacoders.com/570/570794.jpg','https://tse4.mm.bing.net/th/id/OIP.z8CnQLlS0bMu75NwTCmh1QHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.ul8DhGqTE4P3VslF-_PCgQHaEK?pid=Api&P=0&h=180','http://youmeandtrends.com/wp-content/uploads/2015/11/best-hd-beautiful-flowers-images.jpg','https://tse4.mm.bing.net/th/id/OIP.JXLn0FW26GGqEujjv5KQjwHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.4neI5qMxTpP5U6kAdWAufAHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP._Hb2FcpsvQDgzl6U2HjH8QHaEK?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.kbpHTDlb5cnVSU_VHPcMmQHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.i-qrOCpKgjk2zlIZiNmMMAHaE7?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.JxLuJVZx4dhNl2WHAzKcAwHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.ORs3zn1e9XjbJyKFlniPnwHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.ZZQC-jEzWjhkbyc1X-5rYgHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.ntIVnRPdqFS2GjaC4cYuSAHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.wC89CGREEOwH1XE8nTYZAAHaEJ?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.V96IApCI-lG5KufrcZCBGQHaEK?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.AprwCUe9aBTjGkhb29yZzwHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.KkxvcQJZEz2vBZEHMxUJ-QHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.fwGU342R-03L4rr028GFyQHaEo?pid=Api&P=0&h=180'],
+        trees: ['https://tse4.mm.bing.net/th/id/OIP.j9Tn5AM5LMiY9la-HikIEwHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.CgOjSQ2hL2dzNKfyWjKKgQHaEJ?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.IGjTFXRZP0F8tkxSRSz81gHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.YWbujQuYU3emKSjvBsYY7AHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.fwGU342R-03L4rr028GFyQHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.KkxvcQJZEz2vBZEHMxUJ-QHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.A5aBhiaRDLM4Xg-ARScEDQHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.WDPIMY5fykVRrp85zvEJqgHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.UX7makRRIbRCMEeRez_YoQHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.WtLpZ-vN7ssQso40SMuQYgHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.did7DNo-tP60D3fexl8VBwHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.mOBaQETHi1MWRWbh7wEqpgHaE5?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.6FGL9BHLyhtsq4LdYFaDnQHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.KDTkiMHBhkEkVP1MH4o1WwHaE7?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.1gelWsH_QluKa3na_fF6YwHaEK?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.PcrV30lNUDoO1mj5irLrhwHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.QOjjuHGvfEHF8iSAYI3rNQHaFS?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.mOBaQETHi1MWRWbh7wEqpgHaE5?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.eVNsNe93OcNa1Nqlx__NYAHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.lbC3ajIC-8NEg1vjuEH4MAHaEo?pid=Api&P=0&h=180'],
+        wildlife: ['https://tse2.mm.bing.net/th/id/OIP.DsRN9wGtMUFdzdmWijBiQwHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.WpRmFAMvZIWjJQW3TGSktgHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.m2quNZIodQjXj4pn5WnYKwHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.IhDiLn707SyyLvG8VL9pewHaEm?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.sbetfGE31JeqQEF_JZ_GSQHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.J6zxuDUl6Q7ibXgImUrgfQHaE8?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.UalM7YVRWiH2pnTcUaqCOwHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.s6aaWy-nYk1vELRfNDLiZgHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.hYCtJQWrWCO4Wqu80E96mwHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.hUxmnuierl8HuoRrKTPKiAHaFj?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.ihVHy55SZihXDbx_l_p3OQHaFj?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.HT2tpVDEcbhso_ATWVx0wQHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.3ei3Eei8eDm7ByIs2NMhpQHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.vLcnkgUEE1rrks3Flo6q8gHaFj?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.Sog-CKDtRq0avSR86KjupwHaET?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIF.1YXMmergrv6DmLlZA2xQyg?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.qtD1ZfwTI5k3eZkTZ5R0IQHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.4ttxKxVUOO_HwB9qtW7QzAHaFj?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.0K1B0JsMr1wHlEO7VqxpXAHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIF.S33fI4umWdhEF5ZuHi6nxQ?pid=Api&P=0&h=180'],
+        birds: ['https://tse3.mm.bing.net/th/id/OIP.7Q8rcSfgoD1HbU1mSPXXYwHaEK?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.cNoH9GFxzqxSJ6QQKVzekgHaEK?pid=Api&P=0&h=180','http://hdqwalls.com/wallpapers/colorful-parrot-bird.jpg','https://tse1.mm.bing.net/th/id/OIP.f4Oh7XjnOm6hZGAJjZMdOgHaFj?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.dqYW8EUpDKC6Dzw059OqsgHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.nQYJBrPMKPuW1uDDDr70-QHaEo?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.ahVTxG7rVQPu2AG7KJ813wHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.uIVUYWLbRdp_5gLOuB9LRwHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.7TYEQ3_XQcD1XvRuJh7wFwHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.md6e_5X0ZvflVd9ZMN4-YQHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.1oN48MFE3shAiFtB4l5giQHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.cB0DrkXOxi5DpEfrsUF7WAHaEo?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.N ObiNfQlgUhUgZeKVe7Max5xgdwHaEK?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.nBNxfaD7mwdWKfYOr1SbPAHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.lqCu3J1p8Qx9GDuFFpoh4wHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.qYAETisaQpQ-o6CfqegeCQHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.Xi6eHJ-ajiYvW-gBv0YmLwHaEo?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.0F3UwC8QMSQeU--TuCXUcQHaFj?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.IPJk1T89G09szd4B26q-qQHaEo?pid=Api&P=0&h=180','https://cdn.wallpapersafari.com/29/41/hJXE5r.jpg'],
+        historical: ['https://tse1.mm.bing.net/th/id/OIP.KRZupAumsFWue-ckbWSBpgHaE7?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.XPTGoXppv6y1OlCbf8MU3gHaE8?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.dLI7HgHtzTTgc4ytrYDQZwHaHa?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP._hLLAWvmvK704i7E2BGW0wHaEc?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.lf-l_ceLnXMqQ3s-xH1fKgHaE8?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.iC3S1YbDtL2_t2p7EAr_MwHaE4?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.Sko9IErcUVQBLMDXf6tUAAHaE7?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.D0HQVB-srks8JIom28pZzAHaE8?pid=Api&P=0&h=180','https://www.tripsavvy.com/thmb/LuDYute0LRGcEq0IC52CPFMBOiw=/2097x1429/filters:no_upscale():max_bytes(150000):strip_icc()/the-great-wall-of-china-1058859096-4d875694009b43eb9896a09abddc1f04.jpg','https://tse1.mm.bing.net/th/id/OIP.5fwqncn2hS95sjgYHekeNwHaDc?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.mapIP0rgf-bdyoF9DY1cZAHaE8?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.7NzidNOv2XJt9B1ZAH2xJgE8DF?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.ZBZAuYcmUFEsO93oD86H7gHaE8?pid=Api&P=0&h=180','https://assets-news.housing.com/news/wp-content/uploads/2022/08/05095206/Top-15-tourist-places-in-northern-India-09.jpg','https://images.saymedia-content.com/.image/t_share/MTg4NDIyMzY0OTA3MTg1OTY5/top-10-tourist-places-to-visit-in-tamil-nadu.jpg','https://tse1.mm.bing.net/th/id/OIP.Hdq8A05fSZxRDlRwO5oJywHaE8?pid=Api&P=0&h=180','https://www.holidify.com/images/attr_square/2131.png','http://2.bp.blogspot.com/-JYQ8x3mIAq4/UdRNXZb3rtI/AAAAAAAAATs/VpGaowkM4cw/s1600/Lotus-Templeとしみず-1600x1060.jpg','https://tse3.mm.bing.net/th/id/OIP.8e5UNVF6N2mEXn9uhjFYZQHaEO?pid=Api&P=0&h=180','https://www.fabhotels.com/blog/wp-content/uploads/2018/08/1000x650-153.jpg'],
+        architecture: ['https://tse1.mm.bing.net/th/id/OIP.Np-DtUfqMh0GQrzeIHqODgHaDt?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.-8WaYuUIZyvk2uY0OD1GOgEsDr?pid=Api&P=0&h=180','https://dp5zphk8udxg9.cloudfront.net/wp-content/uploads/2016/08/Chand_Baori_Step-well_at_Abhaneri-e1472538895378.jpg','https://allthatsinteresting.com/wordpress/wp-content/uploads/2012/08/amazing-indian-architecture-chhatrapati-station2.jpg','https://tse3.mm.bing.net/th/id/OIP.j2WOzkEzwhtFh6S_FgaL5wHaEo?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.v3U04Ny6nYLO79QyB4nfMQHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.ZvrtnbVjotAd9UPyNPunVQHaEK?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.sAW5211jVNxlWhZGTpQPhwHaFN?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.a_Cf1hQIW8GpWQ0lKDup7gHaFj?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.U-Y-zjMXVDGzGv5saS7lqgHaFj?pid=Api&P=0&h=180','https://www.newszii.com/wp-content/uploads/2016/09/Modern-Architectural-Wonders_v22.jpg','https://tse4.mm.bing.net/th/id/OIP.1T04x0-4D555LcK_mlwPMgHaHX?pid=Api&P=0&h=180','https://i.pinimg.com/originals/7c/f8/14/7cf8146ccbb5e4f2e090df3a3843fe97.jpg','https://tse1.mm.bing.net/th/id/OIP.d5ph4iChO671wmWOO5p9ywHaFj?pid=Api&P=0&h=180','https://ingujarat.in/wp-content/uploads/2018/07/Rani_ki_vav1.jpg','https://tse4.mm.bing.net/th/id/OIP.p1G8RQiP_maxmSyox85wDwHaFj?pid=Api&P=0&h=180','https://cdn.thecoolist.com/wp-content/uploads/2017/05/Turning-Torso-architectural-wonder.jpg','https://themysteriousworld.com/wp-content/uploads/2014/10/Petra-Jordan-2.jpg','https://www.visitqatar.qa/content/dam/visitqatar/img/things-to-do/art-culture/architecture/10-architectural-wonders-in-qatar/museum-of-islamic-art.jpg/jcr:content/renditions/huge-2560px.jpeg','https://i.pinimg.com/originals/1f/04/55/1f0455ed73d9b20e7517ed877d4267a8.jpg'],
+        cruise: ['https://tse1.mm.bing.net/th/id/OIP.D62Ghn8s5-5RCRNYSs1ffAHaEK?pid=Api&P=0&h=180','https://rivercruiseadvisor.com/wp-content/uploads/2022/06/AmaWaterways-1.jpg','https://tse2.mm.bing.net/th/id/OIP.XuzlKHHgjfVi5g5HwK5uQwHaDA?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.6a_FJcRySnaO8-LCHhDcxAHaEy?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.-GfqGm0DQISqe2t_okGmAAAAAA?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.g1tpJHeBTENM0eao5290ygHaEK?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.xsfm_G-kiP3e5KjBkznilgHaEc?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.rZol5LF5aVg2aLi72rDcgAHaFI?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.gnhXhBXutPM7THevv4D4_AHaD4?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.A-gqCyR5xt6SCV6LMV022gHaEE?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.pH2TKdNMr-LT2tBo9XR3igHaE8?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.4blEMlmraVvXTJpJ2k47gwHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.fjYaYHq4isgWB7kfeRYbOwHaEp?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.51WPmDsQQA7L3al9XN9EigHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.KweoL2mpmUWQIMjJWb8vuQHaEV?pid=Api&P=0&h=180','https://d23n7ahjfnjotp.cloudfront.net/imgs/mobileheaderipad/ship_195320_195320_amalyra_ipad_1024x416_mobhdr.jpg','https://tse4.mm.bing.net/th/id/OIP.aPGVnBxGugirXl9iIHTJewHaE8?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.wIZlfohgDpq9o_XLgbqdKAHaDB?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.fsiMd1akAB9aJ4Q3W8dM-gHaDA?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.8RvWeV1xD2x5ZiYauPQKNQHaEL?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.VzB66H-oQuJZw3V9niii5wHaFB?pid=Api&P=0&h=180'],
+        desserts: ['https://tse1.mm.bing.net/th/id/OIP.DQQU0vnQAaG_XM_K8q3P6gHaHa?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.AGafQxYQXf10PXRQtRR6CAHaHa?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.QWhdll1kwA3bj3jEWNX20gHaGy?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.thnRZ4oGIVSZr6yRbpdISgHaHa?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.q-MjKhY_qdIcldnZOnvunwHaGM?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP._IC3Gk1GENHsAtYtcX_klQHaLH?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.YBhzuN9FOVWTKmJrrC_4BgHaHa?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.mkgmOZgFCD4p0G2H0S_7hAHaE8?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.Pw3gCt7uaL6HnGZcc5SwcAHaE8?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.pD_UcCg8c6GGw17GREjmWQHaIr?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.XCLnV1aFJpgNPtmXt7xIAQHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.a9Si3kTsZ3lJEtu4Pv5c1AHaKX?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.RDfQJx2irjh1ziFwHZ7yQwHaGx?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.iK5MMTSi6AKAJ5sOnQ30qAHaLH?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.SsH8G_gxFUXOPxhJu_xdDgHaLH?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.00Rw2yz2hbxOoeh1fmw_OAHaFj?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.wI9UIdnfyu43zwUixyeYDAHaIB?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.UOSf-xdgGJa_aZzW7qhT4AHaHa?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.fTBdX_y7Bc5HeG4Ngu_7CgHaHa?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.SqPEpyBjRwUY7QtPcL2khgHaHa?pid=Api&P=0&h=180'],
+        cuisine: ['https://tse3.mm.bing.net/th/id/OIP.SsMYdMwRiTSINO4RnaRndgHaFc?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.d96JzTpT3XUR6_cIfZqHywHaE8?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.GjIwCh89aXCNSbCMbriWkwHaE7?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.O22XVbCSLWKlhumiObcEGgHaFj?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.o2khFhHlWW5c1LqNTtJKFgHaFj?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.iOkbsR-dXiP4DPV5eJuyVwHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.Q0XfW_uyz6hJtK6r6UTyywHaEz?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.MdgcGUol2nLx8UWDX8pOpwHaEK?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.qcGu4nx1n-BgdM_tQV8w2wHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.qsfKswnds3fQEQ881xMS-QHaE7?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.RqfSbn8Z8BkLmg_ZlHZMvAHaFj?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.IbGSDfYdFg56BVSTPyDiqgHaD2?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.1y6egqpZFbevGUUb_byIWQHaHa?pid=Api&P=0&h=180','https://tse4.mm.bing.net/th/id/OIP.dBYdyGUpuNKtvQyHVS7bhgHaE8?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.E37bwxibOQi7Tfnkt5AXLQHaD2?pid=Api&P=0&h=180','https://tse1.mm.bing.net/th/id/OIP.FXo3qjbFPeCmK5g_LtIqSgHaE8?pid=Api&P=0&h=180','https://tse3.mm.bing.net/th/id/OIP.A5olDJ300xZ1clOwGPja_gHaE8?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.x-R7FVW3NfBXVkUY6Bjc3QHaDj?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.TDKBZXOblk4L61v08dPUjQHaE5?pid=Api&P=0&h=180','https://tse2.mm.bing.net/th/id/OIP.btBHwMCK_Vjw8pjpjjExTwHaEK?pid=Api&P=0&h=180'],
+      };
+
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const imageGrid = document.getElementById("imageGrid");
+      const defaultImage = document.getElementById("defaultImage");
+      const galleryTitle = document.getElementById("galleryTitle");
+
+      checkboxes.forEach(cb => cb.addEventListener("change", updateImages));
+
+      function updateImages() {
+        const selected = Array.from(checkboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.value);
+        imageGrid.innerHTML = "";
+
+        if (selected.length === 0) {
+          defaultImage.style.display = "block";
+          imageGrid.appendChild(defaultImage);
+          galleryTitle.textContent = "Explore Categories";
+          return;
+        }
+
+        defaultImage.style.display = "none";
+
+        const allImages = [];
+        selected.forEach(cat => {
+          if (imageMap[cat]) {
+            allImages.push(
+              ...imageMap[cat].map((url, i) => ({
+                url,
+                category: cat,
+                index: i + 1,
+                likeCount: likedImages.has(`${cat}-${i}`) ? 1 : 0,
+                id: `${cat}-${i}`
+              }))
+            );
+          }
+        });
+
+        for (let i = allImages.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [allImages[i], allImages[j]] = [allImages[j], allImages[i]];
+        }
+
+        allImages.forEach(({ url, category, index, likeCount, id }) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${url}" alt="${category.charAt(0).toUpperCase() + category.slice(1)} Image ${index}" onerror="this.src='http://cdn.wallpapersafari.com/48/17/0SDb2r.jpg';">
+            <div class="card-content">
+              <h4>${category.charAt(0).toUpperCase() + category.slice(1)} ${index}</h4>
+              <div class="card-actions">
+                <button class="like-btn ${likedImages.has(id) ? 'liked' : ''}" data-id="${id}" aria-label="Like ${category} image ${index}">
+                  <i class="fas fa-heart"></i><span class="like-count">${likeCount}</span>
+                </button>
+                <button class="save-btn" data-id="${id}" data-url="${url}" aria-label="Save ${category} image ${index}">
+                  <i class="fas fa-bookmark"></i>
+                </button>
+              </div>
+            </div>`;
+          imageGrid.appendChild(card);
+
+          const likeBtn = card.querySelector('.like-btn');
+          const saveBtn = card.querySelector('.save-btn');
+
+          likeBtn.addEventListener('click', () => {
+            if (!likedImages.has(id)) {
+              likedImages.add(id);
+              likeBtn.classList.add('liked');
+              const countElement = likeBtn.querySelector('.like-count');
+              countElement.textContent = parseInt(countElement.textContent) + 1;
+              saveLikedImages();
+            }
+          });
+
+          saveBtn.addEventListener('click', () => {
+            const imageUrl = saveBtn.getAttribute('data-url');
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `${category}_${index}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            saveBtn.classList.toggle('saved');
+          });
+        });
+
+        galleryTitle.textContent = selected.length === 1
+          ? `${selected[0].charAt(0).toUpperCase() + selected[0].slice(1)} Gallery`
+          : "Curated Gallery";
+      }
+
+      window.toggleSub = function (el) {
+        const category = el.closest('.category');
+        const sub = category.querySelector('.subcategories');
+        const icon = category.querySelector('.toggle-icon');
+        const isOpen = category.classList.toggle('open');
+        sub.style.display = isOpen ? 'block' : 'none';
+        icon.textContent = isOpen ? '−' : '+';
+        el.setAttribute('aria-expanded', isOpen);
+      };
+    });
+  </script>
+</body>
+</html>
